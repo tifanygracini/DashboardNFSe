@@ -2,7 +2,7 @@
 import streamlit as st
 
 from nfse.config.settings import ConfigError, get_settings
-from nfse.data import ERROS_BANCO, BancoIndisponivel, DestinoBanco
+from nfse.data.database import ERROS_BANCO, BancoIndisponivel, DestinoBanco
 from nfse.services import relatorios_service as rel
 from nfse.ui.dashboard.components.filtros import filtros_sidebar
 from nfse.ui.dashboard.components.graficos import grafico_mensal
