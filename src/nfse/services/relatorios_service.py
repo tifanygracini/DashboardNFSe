@@ -5,7 +5,7 @@ import pandas as pd
 
 from nfse.data import DestinoBanco, conectar
 from nfse.data.database import COLUNAS, existe_tabela
-from nfse.domain import StatusNota, TipoNota
+from nfse.domain.models import StatusNota, TipoNota
 
 
 def carregar_notas(destino: DestinoBanco) -> pd.DataFrame:
