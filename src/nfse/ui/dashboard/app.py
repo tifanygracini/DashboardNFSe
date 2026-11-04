@@ -1,7 +1,7 @@
 """Dashboard das NFS-e. Rodar com:  nfse-dashboard  (ou streamlit run src/nfse/ui/dashboard/app.py)"""
 import streamlit as st
 
-from nfse.config import ConfigError, get_settings
+from nfse.config.settings import ConfigError, get_settings
 from nfse.data import ERROS_BANCO, BancoIndisponivel, DestinoBanco
 from nfse.services import relatorios_service as rel
 from nfse.ui.dashboard.components.filtros import filtros_sidebar
