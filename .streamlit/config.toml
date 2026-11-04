@@ -1,0 +1,19 @@
+# Gerado por tools/gerar_config_tema.py a partir de assets/marca/. Não edite à mão.
+
+[client]
+toolbarMode = "viewer"  # esconde o menu de desenvolvedor de quem só visualiza
+
+[browser]
+gatherUsageStats = false
+
+[theme.light]
+primaryColor = "#011F48"
+backgroundColor = "#F7F8FA"
+secondaryBackgroundColor = "#EDEFF2"
+textColor = "#153157"
+
+[theme.dark]
+primaryColor = "#D6A84B"
+backgroundColor = "#001024"
+secondaryBackgroundColor = "#102C53"
+textColor = "#EEF2F7"

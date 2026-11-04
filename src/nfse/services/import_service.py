@@ -1,11 +1,8 @@
 """Pasta de XMLs -> banco. Pode rodar várias vezes: a chave de acesso evita duplicidade."""
 import xml.etree.ElementTree as ET
 from dataclasses import dataclass, field
-from pathlib import Path
 
-from nfse.data.notas_repository import NotasRepository
-from nfse.data.xml_storage import  XmlStorage
-from nfse.data.database import conectar
+from nfse.data import DestinoBanco, NotasRepository, XmlStorage, conectar
 from nfse.parsers.evento_parser import chave_cancelada
 from nfse.parsers.nfse_parser import ler_nota
 
@@ -25,15 +22,15 @@ class ResultadoImportacao:
 
 
 class ImportService:
-    def __init__(self, storage: XmlStorage, banco: Path, cnpj_empresa: str):
+    def __init__(self, storage: XmlStorage, destino: DestinoBanco, cnpj_empresa: str):
         self.storage = storage
-        self.banco = banco
+        self.destino = destino
         self.cnpj_empresa = cnpj_empresa
 
     def importar(self) -> ResultadoImportacao:
         res = ResultadoImportacao()
         cancelamentos: list[str] = []
-        with conectar(self.banco) as con:
+        with conectar(self.destino) as con:
             repo = NotasRepository(con)
             for arq in self.storage.listar():
                 try:

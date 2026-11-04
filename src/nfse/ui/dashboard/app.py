@@ -1,9 +1,8 @@
 """Dashboard das NFS-e. Rodar com:  nfse-dashboard  (ou streamlit run src/nfse/ui/dashboard/app.py)"""
-from pathlib import Path
-
 import streamlit as st
 
-from nfse.config.settings import ConfigError, get_settings
+from nfse.config import ConfigError, get_settings
+from nfse.data import ERROS_BANCO, BancoIndisponivel, DestinoBanco
 from nfse.services import relatorios_service as rel
 from nfse.ui.dashboard.components.filtros import filtros_sidebar
 from nfse.ui.dashboard.components.graficos import grafico_mensal
@@ -13,9 +12,10 @@ from nfse.ui.dashboard.components.tema import aplicar_tema, barra_superior, roda
 from nfse.ui.dashboard.marca import carregar_marca
 
 
-@st.cache_data(ttl=30)
-def _carregar(banco: str):
-    return rel.carregar_notas(Path(banco))
+@st.cache_data(ttl=60, show_spinner="Carregando notas...")
+def _carregar(_destino: DestinoBanco, chave: str):
+    """`_destino` fica fora da chave do cache (tem a senha); `chave` identifica o banco sem a senha."""
+    return rel.carregar_notas(_destino)
 
 
 def main():
@@ -36,10 +36,15 @@ def main():
     for aviso in marca.avisos:
         st.sidebar.warning(aviso)
 
-    if not cfg.banco.exists():
-        st.warning("Ainda não existe o banco de notas. Rode primeiro: nfse-baixar (ou nfse-importar).")
+    destino = DestinoBanco(cfg.banco, cfg.database_url)
+    try:
+        dados = _carregar(destino, destino.chave_cache())
+    except BancoIndisponivel as e:
+        st.warning(str(e))
         st.stop()
-    dados = _carregar(str(cfg.banco))
+    except ERROS_BANCO as e:
+        st.error(f"Erro ao ler o banco de notas: {str(e).strip().splitlines()[0]}")
+        st.stop()
     if dados.empty:
         st.warning("O banco está vazio. Rode nfse-baixar ou nfse-importar.")
         st.stop()

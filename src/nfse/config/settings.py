@@ -1,6 +1,8 @@
 """Leitura única e validada das configurações.
 
 Ordem de prioridade: variável de ambiente do sistema > arquivo .env > valor padrão.
+No Streamlit Community Cloud, os segredos de nível raiz viram variáveis de ambiente, então
+não é preciso .env lá.
 O .env é lido com dotenv_values (não altera os.environ, então não vaza para subprocessos).
 Caminhos relativos são resolvidos a partir da raiz do projeto, não da pasta de onde se rodou o comando.
 """
@@ -18,8 +20,18 @@ from dotenv import dotenv_values
 from nfse.config.secret import Segredo
 from nfse.domain.documentos import cnpj_valido, so_digitos
 
-RAIZ_PROJETO = Path(__file__).resolve().parents[3]
-CHAVES = ("CNPJ_EMPRESA", "CERT_PFX", "CERT_SENHA", "PASTA_NOTAS", "NFSE_BANCO", "NFSE_ESTADO", "ADN_AMBIENTE")
+
+def _raiz_projeto() -> Path:
+    """Raiz do repositório. Instalado sem -e (ex.: na nuvem), cai para NFSE_RAIZ ou a pasta atual."""
+    candidata = Path(__file__).resolve().parents[3]
+    if (candidata / "pyproject.toml").is_file():
+        return candidata
+    return Path(os.getenv("NFSE_RAIZ") or Path.cwd()).resolve()
+
+
+RAIZ_PROJETO = _raiz_projeto()
+CHAVES = ("CNPJ_EMPRESA", "CERT_PFX", "CERT_SENHA", "PASTA_NOTAS", "NFSE_BANCO", "NFSE_ESTADO", "ADN_AMBIENTE",
+          "NFSE_DATABASE_URL")
 URLS_ADN = {
     "producao": "https://adn.nfse.gov.br",
     "restrita": "https://adn.producaorestrita.nfse.gov.br",
@@ -47,6 +59,7 @@ class Settings:
     adn_ambiente: str
     cert_pfx: Path | None = None
     cert_senha: Segredo | None = field(default=None, repr=False)
+    database_url: Segredo | None = field(default=None, repr=False)  # PostgreSQL; vazio = SQLite em `banco`
 
     @property
     def adn_base_url(self) -> str:
@@ -111,6 +124,10 @@ def carregar(arquivo_env: Path | str | None = None) -> Settings:
     if ambiente not in URLS_ADN:
         raise ConfigError(f"ADN_AMBIENTE deve ser um de: {', '.join(URLS_ADN)}.")
 
+    url = (v.get("NFSE_DATABASE_URL") or "").strip().strip('"')
+    if url and not url.startswith(("postgresql://", "postgres://")):
+        raise ConfigError("NFSE_DATABASE_URL deve começar com postgresql:// (ou deixe vazia para usar o SQLite).")
+
     pfx = (v.get("CERT_PFX") or "").strip().strip('"')
     senha = v.get("CERT_SENHA") or ""
 
@@ -122,6 +139,7 @@ def carregar(arquivo_env: Path | str | None = None) -> Settings:
         adn_ambiente=ambiente,
         cert_pfx=_caminho(pfx, pfx) if pfx else None,
         cert_senha=Segredo(senha) if senha else None,
+        database_url=Segredo(url) if url else None,
     )
 
 

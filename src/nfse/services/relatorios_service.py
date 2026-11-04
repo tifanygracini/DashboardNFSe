@@ -1,16 +1,22 @@
 """Leitura do banco e agregações do dashboard (pandas). Devolve números, a formatação fica na UI."""
 from dataclasses import dataclass
-from pathlib import Path
 
 import pandas as pd
 
-from nfse.data.database import conectar
-from nfse.domain.models import StatusNota, TipoNota
+from nfse.data import DestinoBanco, conectar
+from nfse.data.database import COLUNAS, existe_tabela
+from nfse.domain import StatusNota, TipoNota
 
 
-def carregar_notas(banco: Path) -> pd.DataFrame:
-    with conectar(banco) as con:
-        return pd.read_sql_query("SELECT * FROM notas", con)
+def carregar_notas(destino: DestinoBanco) -> pd.DataFrame:
+    """Lê todas as notas (só leitura: funciona com o usuário somente-leitura do PostgreSQL)."""
+    with conectar(destino, criar=False) as con:
+        if not existe_tabela(con):
+            return pd.DataFrame(columns=[nome for nome, _ in COLUNAS])
+        cur = con.executar(f"SELECT * FROM {con.tabela}")
+        colunas = [d[0] for d in cur.description]
+        linhas = cur.fetchall()
+    return pd.DataFrame(linhas, columns=colunas)
 
 
 @dataclass(frozen=True)

@@ -2,12 +2,14 @@
 .env
 *.pfx
 *.p12
+.streamlit/secrets.toml
 
 # dados gerados
 data/
 logs/
 
 # ambiente
+venv/
 .venv/
 __pycache__/
 *.pyc
