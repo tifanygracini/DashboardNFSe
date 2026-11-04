@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<NFSe xmlns="http://www.sped.fazenda.gov.br/nfse" versao="1.00">
+  <infNFSe Id="NFS52087072111223344000186000000000004008434352503081">
+    <xLocEmi>Goiania</xLocEmi>
+    <nNFSe>40</nNFSe>
+    <emit><CNPJ>11223344000186</CNPJ><xNome>EXEMPLO ENGENHARIA E CONSULTORIA LTDA</xNome></emit>
+    <valores>
+      <vBC>9091.57</vBC><pAliqAplic>3.00</pAliqAplic><vISSQN>272.75</vISSQN>
+      <vTotalRet>272.75</vTotalRet><vLiq>8818.82</vLiq>
+    </valores>
+    <DPS versao="1.00">
+      <infDPS Id="DPS00000000000000000000000000000000000000000040">
+        <dhEmi>2026-07-16T11:55:00-03:00</dhEmi>
+        <prest><CNPJ>11223344000186</CNPJ></prest>
+        <toma><CNPJ>78901234000156</CNPJ><xNome>INDUSTRIA GAMA LTDA</xNome></toma>
+        <serv><cServ><cTribNac>070201</cTribNac><xDescServ>Projeto de engenharia civil</xDescServ></cServ></serv>
+        <valores>
+          <vServPrest><vServ>9091.57</vServ></vServPrest>
+          <vDescCondIncond><vDescIncond>0.00</vDescIncond></vDescCondIncond>
+          <trib><tribMun><tribISSQN>1</tribISSQN><tpRetISSQN>2</tpRetISSQN></tribMun></trib>
+        </valores>
+      </infDPS>
+    </DPS>
+  </infNFSe>
+</NFSe>

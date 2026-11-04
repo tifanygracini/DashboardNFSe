@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<NFSe xmlns="http://www.sped.fazenda.gov.br/nfse" versao="1.00">
+  <infNFSe Id="NFS52087072111223344000186000000000003732140708939094">
+    <xLocEmi>Goiania</xLocEmi>
+    <nNFSe>37</nNFSe>
+    <emit><CNPJ>11223344000186</CNPJ><xNome>EXEMPLO ENGENHARIA E CONSULTORIA LTDA</xNome></emit>
+    <valores>
+      <vBC>9789.06</vBC><pAliqAplic>3.00</pAliqAplic><vISSQN>293.67</vISSQN>
+      <vTotalRet>0.00</vTotalRet><vLiq>9789.06</vLiq>
+    </valores>
+    <DPS versao="1.00">
+      <infDPS Id="DPS00000000000000000000000000000000000000000037">
+        <dhEmi>2026-07-07T16:28:00-03:00</dhEmi>
+        <prest><CNPJ>11223344000186</CNPJ></prest>
+        <toma><CNPJ>56789012000134</CNPJ><xNome>INCORPORADORA BETA S/A</xNome></toma>
+        <serv><cServ><cTribNac>070202</cTribNac><xDescServ>Consultoria em engenharia</xDescServ></cServ></serv>
+        <valores>
+          <vServPrest><vServ>9789.06</vServ></vServPrest>
+          <vDescCondIncond><vDescIncond>0.00</vDescIncond></vDescCondIncond>
+          <trib><tribMun><tribISSQN>1</tribISSQN><tpRetISSQN>1</tpRetISSQN></tribMun></trib>
+        </valores>
+      </infDPS>
+    </DPS>
+  </infNFSe>
+</NFSe>

@@ -1,0 +1,33 @@
+[project]
+name = "nfse-dashboard"
+version = "0.2.0"
+description = "Robô do ADN (NFS-e nacional) + importador SQLite + dashboard Streamlit"
+requires-python = ">=3.11"
+dependencies = [
+    "python-dotenv>=1.0",
+    "requests>=2.31",
+    "requests-pkcs12>=1.22",
+    "pandas>=2.2",
+    "plotly>=5.20",
+    "streamlit>=1.40",
+]
+
+[project.optional-dependencies]
+keyring = ["keyring>=25"]
+dev = ["pytest>=8"]
+
+[project.scripts]
+nfse-baixar = "nfse.cli.baixar:main"
+nfse-importar = "nfse.cli.importar:main"
+nfse-dashboard = "nfse.cli.dashboard:main"
+
+[build-system]
+requires = ["setuptools>=69"]
+build-backend = "setuptools.build_meta"
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.pytest.ini_options]
+pythonpath = ["src"]
+testpaths = ["tests"]

@@ -1,0 +1,14 @@
+# segredos
+.env
+*.pfx
+*.p12
+
+# dados gerados
+data/
+logs/
+
+# ambiente
+.venv/
+__pycache__/
+*.pyc
+.pytest_cache/

@@ -1,0 +1,4 @@
+[console_scripts]
+nfse-baixar = nfse.cli.baixar:main
+nfse-dashboard = nfse.cli.dashboard:main
+nfse-importar = nfse.cli.importar:main

@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<NFSe xmlns="http://www.sped.fazenda.gov.br/nfse" versao="1.00">
+  <infNFSe Id="NFS52087072111223344000186000000000001626428402240134">
+    <xLocEmi>Goiania</xLocEmi>
+    <nNFSe>16</nNFSe>
+    <emit><CNPJ>11223344000186</CNPJ><xNome>EXEMPLO ENGENHARIA E CONSULTORIA LTDA</xNome></emit>
+    <valores>
+      <vBC>12125.22</vBC><pAliqAplic>3.00</pAliqAplic><vISSQN>363.76</vISSQN>
+      <vTotalRet>0.00</vTotalRet><vLiq>12125.22</vLiq>
+    </valores>
+    <DPS versao="1.00">
+      <infDPS Id="DPS00000000000000000000000000000000000000000016">
+        <dhEmi>2026-07-21T15:09:00-03:00</dhEmi>
+        <prest><CNPJ>11223344000186</CNPJ></prest>
+        <toma><CNPJ>67890123000145</CNPJ><xNome>PREFEITURA FICTICIA DE TESTE</xNome></toma>
+        <serv><cServ><cTribNac>070201</cTribNac><xDescServ>Projeto de engenharia civil</xDescServ></cServ></serv>
+        <valores>
+          <vServPrest><vServ>12125.22</vServ></vServPrest>
+          <vDescCondIncond><vDescIncond>0.00</vDescIncond></vDescCondIncond>
+          <trib><tribMun><tribISSQN>1</tribISSQN><tpRetISSQN>1</tpRetISSQN></tribMun></trib>
+        </valores>
+      </infDPS>
+    </DPS>
+  </infNFSe>
+</NFSe>

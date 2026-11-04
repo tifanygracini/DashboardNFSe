@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<NFSe xmlns="http://www.sped.fazenda.gov.br/nfse" versao="1.00">
+  <infNFSe Id="NFS52087072111223344000186000000000003513734854174770">
+    <xLocEmi>Goiania</xLocEmi>
+    <nNFSe>35</nNFSe>
+    <emit><CNPJ>11223344000186</CNPJ><xNome>EXEMPLO ENGENHARIA E CONSULTORIA LTDA</xNome></emit>
+    <valores>
+      <vBC>27177.85</vBC><pAliqAplic>3.00</pAliqAplic><vISSQN>815.34</vISSQN>
+      <vTotalRet>0.00</vTotalRet><vLiq>27177.85</vLiq>
+    </valores>
+    <DPS versao="1.00">
+      <infDPS Id="DPS00000000000000000000000000000000000000000035">
+        <dhEmi>2026-08-14T15:55:00-03:00</dhEmi>
+        <prest><CNPJ>11223344000186</CNPJ></prest>
+        <toma><CNPJ>45678901000123</CNPJ><xNome>CONSTRUTORA ALFA LTDA</xNome></toma>
+        <serv><cServ><cTribNac>070601</cTribNac><xDescServ>Laudo tecnico e vistoria</xDescServ></cServ></serv>
+        <valores>
+          <vServPrest><vServ>27177.85</vServ></vServPrest>
+          <vDescCondIncond><vDescIncond>0.00</vDescIncond></vDescCondIncond>
+          <trib><tribMun><tribISSQN>1</tribISSQN><tpRetISSQN>1</tpRetISSQN></tribMun></trib>
+        </valores>
+      </infDPS>
+    </DPS>
+  </infNFSe>
+</NFSe>

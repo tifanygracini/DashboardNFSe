@@ -1,0 +1,12 @@
+python-dotenv>=1.0
+requests>=2.31
+requests-pkcs12>=1.22
+pandas>=2.2
+plotly>=5.20
+streamlit>=1.40
+
+[dev]
+pytest>=8
+
+[keyring]
+keyring>=25

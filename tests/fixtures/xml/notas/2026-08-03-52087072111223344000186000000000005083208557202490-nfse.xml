@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<NFSe xmlns="http://www.sped.fazenda.gov.br/nfse" versao="1.00">
+  <infNFSe Id="NFS52087072111223344000186000000000005083208557202490">
+    <xLocEmi>Goiania</xLocEmi>
+    <nNFSe>50</nNFSe>
+    <emit><CNPJ>11223344000186</CNPJ><xNome>EXEMPLO ENGENHARIA E CONSULTORIA LTDA</xNome></emit>
+    <valores>
+      <vBC>7505.85</vBC><pAliqAplic>3.00</pAliqAplic><vISSQN>225.18</vISSQN>
+      <vTotalRet>225.18</vTotalRet><vLiq>7280.67</vLiq>
+    </valores>
+    <DPS versao="1.00">
+      <infDPS Id="DPS00000000000000000000000000000000000000000050">
+        <dhEmi>2026-08-03T16:13:00-03:00</dhEmi>
+        <prest><CNPJ>11223344000186</CNPJ></prest>
+        <toma><CNPJ>89012345000167</CNPJ><xNome>COMERCIAL DELTA EIRELI</xNome></toma>
+        <serv><cServ><cTribNac>070202</cTribNac><xDescServ>Consultoria em engenharia</xDescServ></cServ></serv>
+        <valores>
+          <vServPrest><vServ>7900.89</vServ></vServPrest>
+          <vDescCondIncond><vDescIncond>395.04</vDescIncond></vDescCondIncond>
+          <trib><tribMun><tribISSQN>1</tribISSQN><tpRetISSQN>2</tpRetISSQN></tribMun></trib>
+        </valores>
+      </infDPS>
+    </DPS>
+  </infNFSe>
+</NFSe>

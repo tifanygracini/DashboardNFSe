@@ -1,0 +1,15 @@
+Metadata-Version: 2.4
+Name: nfse-dashboard
+Version: 0.2.0
+Summary: Robô do ADN (NFS-e nacional) + importador SQLite + dashboard Streamlit
+Requires-Python: >=3.11
+Requires-Dist: python-dotenv>=1.0
+Requires-Dist: requests>=2.31
+Requires-Dist: requests-pkcs12>=1.22
+Requires-Dist: pandas>=2.2
+Requires-Dist: plotly>=5.20
+Requires-Dist: streamlit>=1.40
+Provides-Extra: keyring
+Requires-Dist: keyring>=25; extra == "keyring"
+Provides-Extra: dev
+Requires-Dist: pytest>=8; extra == "dev"
