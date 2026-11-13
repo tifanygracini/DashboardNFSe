@@ -1,7 +1,7 @@
 [project]
 name = "nfse-dashboard"
 version = "0.3.0"
-description = "Robô do ADN (NFS-e nacional) + importador PostgreSQL + dashboard Streamlit"
+description = "Robô do ADN (NFS-e nacional) + importador PostgreSQL + dashboard (FastAPI e Streamlit)"
 requires-python = ">=3.11"
 dependencies = [
     "python-dotenv>=1.0",
@@ -15,7 +15,9 @@ dependencies = [
 
 [project.optional-dependencies]
 keyring = ["keyring>=25"]
-dev = ["pytest>=8"]
+dev = ["pytest>=8", "httpx>=0.27"]
+# interface web (FastAPI) com o login do Portal Informe; informe-auth vem do repositório informe-portal
+web = ["informe-auth", "uvicorn[standard]>=0.30"]
 
 [project.scripts]
 nfse-baixar = "nfse.cli.baixar:main"
@@ -28,6 +30,9 @@ build-backend = "setuptools.build_meta"
 
 [tool.setuptools.packages.find]
 where = ["src"]
+
+[tool.setuptools.package-data]
+nfse = ["web/templates/*.html", "web/static/*"]
 
 [tool.pytest.ini_options]
 pythonpath = ["src"]

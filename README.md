@@ -31,3 +31,6 @@ pytest
 ```
 
 Estrutura e regras de dependência entre camadas: `docs/arquitetura.md`.
+
+## Dashboard web (FastAPI, login do Portal Informe)
+`uvicorn nfse.web.asgi:app` — substitui o Streamlit após a virada. Como rodar e publicar no Azure: `docs/web.md`.

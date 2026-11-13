@@ -1,0 +1,21 @@
+/* Complementa o informe.css (pacote informe-auth) com os blocos do dashboard de NFS-e */
+.filtros { display: grid; grid-template-columns: repeat(auto-fit, minmax(170px, 1fr)); gap: 14px; align-items: end; padding: 18px 20px; }
+.filtros fieldset { border: 0; padding: 0; margin: 0; display: flex; gap: 14px; flex-wrap: wrap; }
+.filtros legend { font-weight: 600; margin-bottom: 6px; padding: 0; }
+
+.metricas { display: grid; grid-template-columns: repeat(auto-fit, minmax(210px, 1fr)); gap: 16px; margin: 20px 0; }
+.metrica { background: var(--superficie); border: 1px solid var(--linha); border-left: 4px solid var(--dourado); border-radius: var(--raio); padding: 16px 18px; box-shadow: var(--sombra); display: flex; flex-direction: column; gap: 4px; }
+.metrica__rotulo { color: var(--texto-suave); font-size: .9rem; }
+.metrica__valor { font-size: 1.55rem; font-variant-numeric: tabular-nums; }
+.metrica__dica { color: var(--texto-suave); font-size: .8rem; }
+
+.grafico { width: 100%; min-height: 380px; }
+.grade-rankings { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 20px; margin: 20px 0; }
+.grade-rankings .cartao + .cartao { margin-top: 0; }
+
+td.num, th.num { text-align: right; font-variant-numeric: tabular-nums; white-space: nowrap; }
+table.notas { font-size: .9rem; }
+table.notas td.servico { max-width: 280px; }
+tr.cancelada td { color: var(--texto-suave); text-decoration: line-through; text-decoration-color: rgba(128,128,128,.6); }
+tr.cancelada td .selo { text-decoration: none; }
+.paginacao { display: flex; gap: 14px; align-items: center; justify-content: center; margin-top: 16px; color: var(--texto-suave); }
