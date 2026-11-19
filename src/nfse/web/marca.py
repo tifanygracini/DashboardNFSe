@@ -1,7 +1,7 @@
 """Identidade visual do escritório: lida de assets/marca/ (escritorio.json + logo .png).
 
 Tudo que vem do JSON é validado antes de ir para a tela: cores só no formato #RRGGBB e site só http(s).
-Se o JSON faltar ou estiver inválido, o dashboard abre com as cores padrão e mostra um aviso.
+Se o JSON faltar ou estiver inválido, o painel abre com as cores padrão e mostra um aviso.
 """
 import json
 import re
@@ -31,35 +31,6 @@ class Marca:
     assinatura: str = ""
     logo: Path | None = None
     avisos: tuple[str, ...] = field(default=(), compare=False)
-
-    def suave(self, proporcao: float = 0.93) -> str:
-        """Cor primária misturada com branco (fundo da barra lateral)."""
-        return misturar(self.cor_primaria, "#FFFFFF", proporcao)
-
-    def paleta(self, modo: str) -> dict[str, str]:
-        """Cores do tema do Streamlit para 'light' ou 'dark'."""
-        if modo == "dark":
-            return {
-                "primaryColor": self.dark_primary,
-                "backgroundColor": misturar(self.cor_primaria, "#000000", 0.5),
-                "secondaryBackgroundColor": misturar(self.cor_primaria, "#FFFFFF", 0.06),
-                "textColor": "#EEF2F7",
-            }
-        return {
-            "primaryColor": self.light_primary,
-            "backgroundColor": "#F7F8FA",
-            "secondaryBackgroundColor": self.suave(),
-            "textColor": misturar(self.cor_primaria, "#FFFFFF", 0.08),
-        }
-
-    def opcoes_streamlit(self) -> list[str]:
-        """Parâmetros --theme.light.* e --theme.dark.* para o 'streamlit run'.
-
-        Com os dois temas definidos, o app segue o modo do sistema e o usuário pode trocar
-        em ⋮ > Settings. Não usar --theme.base, que travaria um dos modos.
-        """
-        return [f"--theme.{modo}.{chave}={valor}"
-                for modo in ("light", "dark") for chave, valor in self.paleta(modo).items()]
 
     def cores_grafico(self, modo: str | None) -> tuple[str, str]:
         """(emitidas, recebidas) com contraste no fundo do modo atual."""

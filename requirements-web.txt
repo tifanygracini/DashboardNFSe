@@ -1,0 +1,4 @@
+# Azure App Service (informe-nfse). O workflow copia informe-auth para ./vendor antes do deploy.
+./vendor/informe-auth
+-e .
+uvicorn[standard]>=0.30

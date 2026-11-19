@@ -1,8 +1,7 @@
 """Leitura única e validada das configurações.
 
 Ordem de prioridade: variável de ambiente do sistema > arquivo .env > valor padrão.
-No Streamlit Community Cloud, os segredos de nível raiz viram variáveis de ambiente, então
-não é preciso .env lá.
+No Azure App Service, as configurações do app viram variáveis de ambiente, então não é preciso .env lá.
 O .env é lido com dotenv_values (não altera os.environ, então não vaza para subprocessos).
 Caminhos relativos são resolvidos a partir da raiz do projeto, não da pasta de onde se rodou o comando.
 """
@@ -31,7 +30,8 @@ def _raiz_projeto() -> Path:
 
 RAIZ_PROJETO = _raiz_projeto()
 CHAVES = ("CNPJ_EMPRESA", "CERT_PFX", "CERT_SENHA", "PASTA_NOTAS", "NFSE_BANCO", "NFSE_ESTADO", "ADN_AMBIENTE",
-          "NFSE_DATABASE_URL")
+          "NFSE_DATABASE_URL", "CERT_PASTA", "ACESSORIAS_API_URL", "ACESSORIAS_API_TOKEN", "ACESSORIAS_CAMPO_DOMINIO",
+          "NFSE_PARALELO")
 URLS_ADN = {
     "producao": "https://adn.nfse.gov.br",
     "restrita": "https://adn.producaorestrita.nfse.gov.br",
@@ -52,18 +52,28 @@ def _caminho(valor: str | None, padrao: str) -> Path:
 # ---------------------------------------------------------------- modelo
 @dataclass(frozen=True)
 class Settings:
-    cnpj_empresa: str
-    pasta_notas: Path
+    cnpj_empresa: str               # opcional desde a versão multiempresa: dono das notas antigas (migração)
+    pasta_notas: Path               # XMLs em <pasta>/<cnpj>/AAAA-MM/
     banco: Path
-    arquivo_estado: Path
+    arquivo_estado: Path            # estado do robô da versão de uma empresa só (lido só na migração)
     adn_ambiente: str
     cert_pfx: Path | None = None
     cert_senha: Segredo | None = field(default=None, repr=False)
     database_url: Segredo | None = field(default=None, repr=False)  # PostgreSQL; vazio = SQLite em `banco`
+    cert_pasta: Path | None = None  # pasta de rede com os certificados A1 (.pfx/.p12) das empresas
+    acessorias_api_url: str = "https://api.acessorias.com"
+    acessorias_api_token: Segredo | None = field(default=None, repr=False)
+    acessorias_campo_dominio: str = ""  # campo do Acessórias com o código da empresa no Domínio
+    paralelo: int = 4               # empresas consultadas ao mesmo tempo no ADN
 
     @property
     def adn_base_url(self) -> str:
         return URLS_ADN[self.adn_ambiente]
+
+    @property
+    def destino(self):
+        from nfse.data.database import DestinoBanco
+        return DestinoBanco(self.banco, self.database_url, self.cnpj_empresa or None)
 
     def credenciais_certificado(self, interativo: bool | None = None) -> tuple[Path, Segredo]:
         """Devolve (pfx, senha) só quando o robô precisa falar com o ADN.
@@ -115,9 +125,7 @@ def carregar(arquivo_env: Path | str | None = None) -> Settings:
     v = _ler_fontes(arquivo)
 
     cnpj = so_digitos(v.get("CNPJ_EMPRESA"))
-    if not cnpj:
-        raise ConfigError(f"CNPJ_EMPRESA não está configurado (arquivo lido: {arquivo}).")
-    if not cnpj_valido(cnpj):
+    if cnpj and not cnpj_valido(cnpj):
         raise ConfigError("CNPJ_EMPRESA inválido: precisa ter 14 dígitos com dígitos verificadores corretos.")
 
     ambiente = (v.get("ADN_AMBIENTE") or "producao").strip().lower()
@@ -130,6 +138,12 @@ def carregar(arquivo_env: Path | str | None = None) -> Settings:
 
     pfx = (v.get("CERT_PFX") or "").strip().strip('"')
     senha = v.get("CERT_SENHA") or ""
+    pasta_cert = (v.get("CERT_PASTA") or "").strip().strip('"')
+    token = (v.get("ACESSORIAS_API_TOKEN") or "").strip()
+    try:
+        paralelo = max(1, min(16, int(v.get("NFSE_PARALELO") or 4)))
+    except ValueError:
+        raise ConfigError("NFSE_PARALELO deve ser um número de 1 a 16.") from None
 
     return Settings(
         cnpj_empresa=cnpj,
@@ -140,6 +154,11 @@ def carregar(arquivo_env: Path | str | None = None) -> Settings:
         cert_pfx=_caminho(pfx, pfx) if pfx else None,
         cert_senha=Segredo(senha) if senha else None,
         database_url=Segredo(url) if url else None,
+        cert_pasta=_caminho(pasta_cert, pasta_cert) if pasta_cert else None,
+        acessorias_api_url=(v.get("ACESSORIAS_API_URL") or "https://api.acessorias.com").strip().rstrip("/"),
+        acessorias_api_token=Segredo(token) if token else None,
+        acessorias_campo_dominio=(v.get("ACESSORIAS_CAMPO_DOMINIO") or "").strip(),
+        paralelo=paralelo,
     )
 
 

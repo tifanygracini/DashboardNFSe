@@ -1,0 +1,137 @@
+{% extends "informe/base.html" %}
+{% block cabeca %}
+<link rel="stylesheet" href="/static/painel.css">
+<script src="/_vendor/plotly.min.js" defer></script>
+<script src="/static/painel.js" defer></script>
+{% endblock %}
+{% block conteudo %}
+{% if nao_encontrada %}
+<p><a href="/" class="voltar">← Todas as empresas</a></p>
+<div class="aviso aviso--info" role="status">Empresa não encontrada no cadastro. Ela pode ter sido incluída no Acessórias depois da última sincronização.</div>
+{% else %}
+{% set base = '/empresa/' ~ empresa.cnpj %}
+<p><a href="{{ volta }}" class="voltar">← Todas as empresas</a></p>
+
+<div class="cabecalho-pagina">
+  <div>
+    <h1>{{ empresa.razao }}</h1>
+    <p>CNPJ {{ empresa.cnpj_fmt }}{% if empresa.fantasia %} · {{ empresa.fantasia }}{% endif %}</p>
+  </div>
+  {% if filtros and pode_exportar %}
+  <a class="botao botao--secundario" href="{{ base }}/exportar.csv?{{ filtros.query(pagina=None) }}">Exportar planilha (CSV)</a>
+  {% endif %}
+</div>
+
+<section class="cartao ficha" aria-label="Cadastro da empresa">
+  <dl class="dados ficha__dados">
+    <div><dt>Código Domínio</dt><dd>{{ empresa.codigo or 'não informado' }}</dd></div>
+    <div><dt>Regime tributário</dt><dd><span class="selo selo--regime" title="{{ empresa.regime_original }}">{{ empresa.regime or '—' }}</span>
+      {% if not empresa.ativa %} <span class="selo">inativa no Acessórias</span>{% endif %}</dd></div>
+    <div><dt>Certificado A1</dt><dd><span class="selo {{ empresa.cert_classe }}">{{ empresa.cert_rotulo }}</span>
+      {% if empresa.cert_validade %}<span class="pequeno mudo"> até {{ empresa.cert_validade }}{% if empresa.cert_filial %} (da matriz){% endif %}</span>{% endif %}</dd></div>
+    <div><dt>Última consulta ao ADN</dt><dd><span class="selo {{ empresa.robo_classe }}">{{ empresa.robo_rotulo }}</span>
+      {% if empresa.robo_execucao %}<span class="pequeno mudo"> {{ empresa.robo_execucao }}</span>{% endif %}</dd></div>
+  </dl>
+  {% if empresa.robo_mensagem %}<p class="dica ficha__mensagem">{{ empresa.robo_mensagem }}</p>{% endif %}
+</section>
+
+{% if erro %}
+<div class="aviso aviso--info" role="status">{{ erro }}</div>
+{% elif sem_notas %}
+<div class="aviso aviso--info" role="status">Ainda não há notas desta empresa no banco.
+  {% if empresa.cert_rotulo != 'válido' and empresa.cert_rotulo != 'vence em breve' %}O robô precisa do certificado A1 dela (ou da matriz) na pasta de rede para consultar o ADN.{% endif %}</div>
+{% else %}
+
+<form method="get" action="{{ base }}" class="cartao filtros">
+  <input type="hidden" name="volta" value="{{ volta }}">
+  <div><label for="de">Competência de</label>
+    <select id="de" name="de">{% for c in filtros.todas_competencias %}<option {{ 'selected' if c == filtros.de }}>{{ c }}</option>{% endfor %}</select></div>
+  <div><label for="ate">até</label>
+    <select id="ate" name="ate">{% for c in filtros.todas_competencias %}<option {{ 'selected' if c == filtros.ate }}>{{ c }}</option>{% endfor %}</select></div>
+  <fieldset><legend>Tipo</legend>
+    <label class="caixa"><input type="checkbox" name="tipo" value="EMITIDA" {{ 'checked' if 'EMITIDA' in filtros.tipos }}> Emitidas</label>
+    <label class="caixa"><input type="checkbox" name="tipo" value="RECEBIDA" {{ 'checked' if 'RECEBIDA' in filtros.tipos }}> Recebidas</label>
+  </fieldset>
+  <div><label for="busca">Buscar nas notas</label>
+    <input id="busca" name="busca" type="search" value="{{ filtros.busca }}" placeholder="Número, nome, serviço, chave…"></div>
+  <div><button type="submit" class="botao">Aplicar</button></div>
+</form>
+<p class="dica">Notas canceladas aparecem na tabela, mas não entram nos totais. A busca filtra só a tabela de notas.</p>
+
+<section class="metricas" aria-label="Totais do período">
+  {% for m in metricas %}
+  <div class="metrica"{% if m.dica %} title="{{ m.dica }}"{% endif %}>
+    <span class="metrica__rotulo">{{ m.rotulo }}</span>
+    <strong class="metrica__valor">{{ m.valor }}</strong>
+    {% if m.dica %}<span class="metrica__dica">{{ m.dica }}</span>{% endif %}
+  </div>
+  {% endfor %}
+</section>
+
+{% if evolucao %}{% with evo=evolucao, mostrar_metricas=False %}{% include "_evolucao.html" %}{% endwith %}{% endif %}
+
+<section class="cartao">
+  <h2>Prestados × tomados por mês</h2>
+  {% if grafico %}
+  <div id="grafico-mensal" class="grafico" data-fonte="dados-grafico" role="img" aria-label="Gráfico de barras: base de cálculo por competência, prestados e tomados"></div>
+  <script type="application/json" id="dados-grafico">{{ grafico|tojson }}</script>
+  {% else %}
+  <p class="vazio">Nenhuma nota nos filtros escolhidos.</p>
+  {% endif %}
+</section>
+
+<div class="grade-rankings">
+  {% for titulo, legenda, linhas_r, col in [
+       ("Maiores clientes", "Tomadores das notas emitidas", clientes, "Nome"),
+       ("Maiores fornecedores de serviço", "Prestadores das notas recebidas", fornecedores, "Nome"),
+       ("Faturamento por tipo de serviço", "Código nacional (cTribNac) das emitidas", servicos, "Código")] %}
+  <section class="cartao">
+    <h2>{{ titulo }}</h2>
+    <p class="dica">{{ legenda }}</p>
+    <div class="tabela-wrap"><table>
+      <thead><tr><th>{{ col }}</th><th class="num">Total</th><th class="num">Notas</th></tr></thead>
+      <tbody>
+      {% for r in linhas_r %}
+        <tr><td>{{ r.nome }}{% if r.descricao %}<br><span class="pequeno mudo">{{ r.descricao }}</span>{% endif %}</td>
+          <td class="num">{{ r.total }}</td><td class="num">{{ r.notas }}</td></tr>
+      {% else %}
+        <tr><td colspan="3" class="vazio">Sem notas.</td></tr>
+      {% endfor %}
+      </tbody>
+    </table></div>
+  </section>
+  {% endfor %}
+</div>
+
+<section class="cartao">
+  <div class="cabecalho-pagina cabecalho-pagina--cartao">
+    <h2>Todas as notas filtradas</h2>
+    <p>{{ total_linhas }} nota(s){% if filtros.busca %} com “{{ filtros.busca }}”{% endif %}</p>
+  </div>
+  <div class="tabela-wrap"><table class="notas">
+    <thead><tr><th>Emissão</th><th>Número</th><th>Compet.</th><th>Tipo</th><th>Prestador</th><th>Tomador</th>
+      <th>Serviço</th><th class="num">Base de cálculo</th><th class="num">ISS</th><th>ISS retido?</th></tr></thead>
+    <tbody>
+    {% for n in linhas %}
+      <tr class="{{ 'cancelada' if n.cancelada }}" title="Chave {{ n.chave }}">
+        <td>{{ n.emissao }}</td><td>{{ n.numero }}</td><td>{{ n.competencia }}</td>
+        <td>{{ n.tipo }}{% if n.cancelada %} <span class="selo selo--alerta">cancelada</span>{% endif %}</td>
+        <td>{{ n.prestador }}</td><td>{{ n.tomador }}</td><td class="servico">{{ n.servico }}</td>
+        <td class="num">{{ n.base }}</td><td class="num">{{ n.iss }}</td><td>{{ n.retido }}</td></tr>
+    {% else %}
+      <tr><td colspan="10" class="vazio">Nenhuma nota.</td></tr>
+    {% endfor %}
+    </tbody>
+  </table></div>
+  {% if paginas > 1 %}
+  {% set v = '&volta=' ~ (volta|urlencode) %}
+  <nav class="paginacao" aria-label="Páginas">
+    {% if filtros.pagina > 1 %}<a class="botao botao--secundario botao--pequeno" href="{{ base }}?{{ filtros.query(pagina=filtros.pagina - 1) }}{{ v }}">← Anterior</a>{% endif %}
+    <span>Página {{ filtros.pagina }} de {{ paginas }}</span>
+    {% if filtros.pagina < paginas %}<a class="botao botao--secundario botao--pequeno" href="{{ base }}?{{ filtros.query(pagina=filtros.pagina + 1) }}{{ v }}">Próxima →</a>{% endif %}
+  </nav>
+  {% endif %}
+</section>
+{% endif %}
+{% endif %}
+{% endblock %}

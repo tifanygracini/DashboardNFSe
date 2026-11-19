@@ -2,10 +2,10 @@ from dataclasses import fields
 
 import pytest
 
-from src.nfse.data.database import COLUNAS
-from src.nfse.domain import Nota, RegraError, TipoNota
-from src.nfse.domain import regras
-from src.nfse.domain.documentos import cnpj_valido, so_digitos
+from nfse.data.database import COLUNAS
+from nfse.domain import Nota, RegraError, TipoNota
+from nfse.domain import regras
+from nfse.domain.documentos import cnpj_valido, so_digitos
 
 
 def test_classificar_tipo():
@@ -30,4 +30,4 @@ def test_cnpj():
 
 
 def test_colunas_do_banco_batem_com_a_entidade():
-    assert [f.name for f in fields(Nota)] == [nome for nome, _ in COLUNAS]
+    assert [f.name for f in fields(Nota)] == [nome for nome, _ in COLUNAS if nome != "empresa_cnpj"]

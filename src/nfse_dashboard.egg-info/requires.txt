@@ -3,11 +3,16 @@ requests>=2.31
 requests-pkcs12>=1.22
 pandas>=2.2
 plotly>=5.20
-streamlit>=1.46
 psycopg[binary]>=3.2
+cryptography>=42
 
 [dev]
 pytest>=8
+httpx>=0.27
 
 [keyring]
 keyring>=25
+
+[web]
+informe-auth
+uvicorn[standard]>=0.30

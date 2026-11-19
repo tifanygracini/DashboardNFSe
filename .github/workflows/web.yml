@@ -1,0 +1,56 @@
+name: web
+
+on:
+  push:
+    branches: [main]
+    paths: ["src/**", "tests/**", "pyproject.toml", "requirements-web.txt", ".github/workflows/web.yml"]
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  id-token: write   # login no Azure por OIDC
+
+jobs:
+  testes:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Baixar informe-auth (repositório informe-portal)
+        uses: actions/checkout@v4
+        with:
+          repository: ${{ vars.INFORME_PORTAL_REPO }}   # ex.: dono/informe-portal
+          token: ${{ secrets.INFORME_PORTAL_TOKEN }}    # token só de leitura daquele repositório
+          path: _portal
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - run: pip install -e "./_portal/informe-auth" -e ".[dev]"
+      - run: pytest -q
+
+  deploy:
+    needs: testes
+    if: github.ref == 'refs/heads/main' && github.event_name != 'pull_request'
+    runs-on: ubuntu-latest
+    environment: producao
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/checkout@v4
+        with:
+          repository: ${{ vars.INFORME_PORTAL_REPO }}
+          token: ${{ secrets.INFORME_PORTAL_TOKEN }}
+          path: _portal
+      - name: Empacotar
+        run: |
+          mkdir -p vendor && cp -r _portal/informe-auth vendor/informe-auth && rm -rf _portal
+          cp requirements-web.txt requirements.txt   # o App Service instala o requirements.txt
+          rm -rf tests data .env tools scripts
+      - uses: azure/login@v2
+        with:
+          client-id: ${{ secrets.AZURE_CLIENT_ID }}
+          tenant-id: ${{ secrets.AZURE_TENANT_ID }}
+          subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+      - uses: azure/webapps-deploy@v3
+        with:
+          app-name: informe-nfse
+          package: .

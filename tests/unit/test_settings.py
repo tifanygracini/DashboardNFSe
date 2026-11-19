@@ -1,7 +1,7 @@
 import pytest
 
-from src.nfse.config.secret import Segredo
-from src.nfse.config.settings import ConfigError, carregar
+from nfse.config.secret import Segredo
+from nfse.config.settings import ConfigError, carregar
 
 CNPJ = "11222333000181"  # CNPJ fictício com DV válido
 

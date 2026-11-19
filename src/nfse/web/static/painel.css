@@ -1,0 +1,79 @@
+/* Complementa o informe.css (pacote informe-auth) com os blocos do dashboard de NFS-e */
+.filtros { display: grid; grid-template-columns: repeat(auto-fit, minmax(170px, 1fr)); gap: 14px; align-items: end; padding: 18px 20px; }
+.filtros fieldset { border: 0; padding: 0; margin: 0; display: flex; gap: 14px; flex-wrap: wrap; }
+.filtros legend { font-weight: 600; margin-bottom: 6px; padding: 0; }
+
+.metricas { display: grid; grid-template-columns: repeat(auto-fit, minmax(210px, 1fr)); gap: 16px; margin: 20px 0; }
+.metrica { background: var(--superficie); border: 1px solid var(--linha); border-left: 4px solid var(--dourado); border-radius: var(--raio); padding: 16px 18px; box-shadow: var(--sombra); display: flex; flex-direction: column; gap: 4px; }
+.metrica__rotulo { color: var(--texto-suave); font-size: .9rem; }
+.metrica__valor { font-size: 1.55rem; font-variant-numeric: tabular-nums; }
+.metrica__dica { color: var(--texto-suave); font-size: .8rem; }
+
+.grafico { width: 100%; min-height: 380px; }
+.grade-rankings { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 20px; margin: 20px 0; }
+.grade-rankings .cartao + .cartao { margin-top: 0; }
+
+td.num, th.num { text-align: right; font-variant-numeric: tabular-nums; white-space: nowrap; }
+table.notas { font-size: .9rem; }
+table.notas td.servico { max-width: 280px; }
+tr.cancelada td { color: var(--texto-suave); text-decoration: line-through; text-decoration-color: rgba(128,128,128,.6); }
+tr.cancelada td .selo { text-decoration: none; }
+.paginacao { display: flex; gap: 14px; align-items: center; justify-content: center; margin-top: 16px; color: var(--texto-suave); }
+
+/* ---------- carteira de empresas ---------- */
+.filtros--carteira { grid-template-columns: minmax(260px, 2.2fr) repeat(4, minmax(140px, 1fr)) auto; }
+.filtros__acoes { display: flex; gap: 8px; }
+.filtros__inativas { grid-column: 1 / -1; margin: -4px 0 0; font-size: .9rem; }
+@media (max-width: 1000px) { .filtros--carteira { grid-template-columns: repeat(auto-fit, minmax(170px, 1fr)); } .filtros__busca { grid-column: 1 / -1; } }
+
+.regimes { display: flex; gap: 8px; flex-wrap: wrap; margin: 18px 0 0; }
+.regime { display: inline-flex; align-items: center; gap: 8px; padding: 6px 12px; border-radius: 999px; border: 1px solid var(--linha-forte); background: var(--superficie); text-decoration: none; font-weight: 600; font-size: .9rem; color: var(--texto-suave); }
+.regime:hover { border-color: var(--dourado); color: var(--texto); }
+.regime__qtd { font-variant-numeric: tabular-nums; font-weight: 600; font-size: .78rem; padding: 0 7px; border-radius: 999px; background: var(--fundo); color: var(--texto-suave); }
+.regime--ativo { background: var(--marinho); border-color: var(--marinho); color: #fff; }
+.regime--ativo:hover { color: #fff; }
+.regime--ativo .regime__qtd { background: var(--dourado); color: var(--marinho); }
+@media (prefers-color-scheme: dark) {
+  .regime--ativo, .regime--ativo:hover { background: var(--dourado); border-color: var(--dourado); color: #001024; }
+  .regime--ativo .regime__qtd { background: #001024; color: var(--dourado); }
+}
+
+.metrica--alerta { border-left-color: var(--perigo); }
+.cabecalho-pagina--cartao { margin-bottom: 12px; }
+
+table.empresas { font-size: .88rem; }
+table.empresas th, table.empresas td { padding: 9px 8px; }
+table.empresas th { white-space: nowrap; }
+table.empresas td { vertical-align: middle; }
+table.empresas td.codigo { font-variant-numeric: tabular-nums; color: var(--texto-suave); white-space: nowrap; }
+table.empresas td.empresa { min-width: 230px; }
+table.empresas td.empresa a { font-weight: 600; text-decoration: none; }
+table.empresas td.empresa a:hover { text-decoration: underline; }
+table.empresas td.empresa .pequeno { display: block; }
+table.empresas tr.inativa td { color: var(--texto-suave); }
+.selo--regime { color: var(--texto); border-color: var(--linha-forte); background: var(--fundo); }
+
+/* ---------- empresa ---------- */
+.voltar { text-decoration: none; color: var(--texto-suave); font-weight: 600; }
+.voltar:hover { color: var(--dourado-escuro); }
+.ficha { padding: 18px 22px; margin-bottom: 20px; }
+dl.dados.ficha__dados { display: grid; grid-template-columns: repeat(auto-fit, minmax(210px, 1fr)); gap: 14px 24px; }
+.ficha__dados dt { color: var(--texto-suave); font-size: .85rem; margin-bottom: 4px; }
+.ficha__dados dd { margin: 0; }
+.ficha__mensagem { margin: 12px 0 0; }
+
+/* ---------- uma única empresa ---------- */
+.filtros__empresa { grid-column: 1 / -1; max-width: 640px; }
+.cabecalho-unica { margin-top: 22px; }
+.cabecalho-unica p { margin: 0; }
+.titulo-unica { font-size: 1.45rem; margin: 6px 0 4px; }
+.metricas--empresa { grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); }
+.metricas--empresa .metrica__valor { font-size: 1.3rem; white-space: nowrap; }
+.variacao { font-size: .82rem; font-weight: 600; }
+.variacao .mudo { font-weight: 400; }
+.variacao--alta { color: var(--sucesso); }
+.variacao--baixa { color: var(--perigo); }
+.grade-evolucao { display: grid; grid-template-columns: 1fr; gap: 20px; margin: 20px 0; }
+.grade-evolucao .cartao + .cartao { margin-top: 0; }
+.grade-evolucao__largo { grid-column: 1 / -1; }
+@media (max-width: 640px) { .grade-evolucao { grid-template-columns: 1fr; } }

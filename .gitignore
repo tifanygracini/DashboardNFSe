@@ -2,7 +2,6 @@
 .env
 *.pfx
 *.p12
-.streamlit/secrets.toml
 
 # dados gerados
 /data/
@@ -14,3 +13,6 @@ venv/
 __pycache__/
 *.pyc
 .pytest_cache/
+
+# deploy do App Service (informe-auth copiado pelo workflow)
+vendor/

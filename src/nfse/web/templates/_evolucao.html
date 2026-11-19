@@ -1,0 +1,28 @@
+{# Visão de uma empresa: métricas de evolução (opcional) e gráficos. Espera `evo` (evolucao.montar) e `mostrar_metricas`. #}
+{% if mostrar_metricas %}
+<section class="metricas metricas--empresa" aria-label="Métricas da empresa no período">
+  {% for m in evo.metricas %}
+  <div class="metrica"{% if m.dica %} title="{{ m.dica }}"{% endif %}>
+    <span class="metrica__rotulo">{{ m.rotulo }}</span>
+    <strong class="metrica__valor">{{ m.valor }}</strong>
+    {% if m.variacao %}<span class="variacao {{ 'variacao--alta' if m.variacao.positiva else 'variacao--baixa' }}">{{ '▲' if m.variacao.positiva else '▼' }} {{ m.variacao.texto }} <span class="mudo">{{ m.dica }}</span></span>
+    {% elif m.dica %}<span class="metrica__dica">{{ m.dica }}</span>{% endif %}
+  </div>
+  {% endfor %}
+</section>
+{% endif %}
+
+{% if evo.graficos %}
+<div class="grade-evolucao">
+  {% for g in evo.graficos %}
+  <section class="cartao">
+    <h2>{{ g.titulo }}</h2>
+    <p class="dica">{{ g.dica }}</p>
+    <div class="grafico" data-fonte="dados-{{ g.id }}" role="img" aria-label="{{ g.titulo }}"></div>
+    <script type="application/json" id="dados-{{ g.id }}">{{ g.dados|tojson }}</script>
+  </section>
+  {% endfor %}
+</div>
+{% else %}
+<section class="cartao"><p class="vazio">Nenhuma nota emitida por esta empresa no período{% if not evo.tem_notas %} — o robô ainda não trouxe notas dela{% endif %}.</p></section>
+{% endif %}

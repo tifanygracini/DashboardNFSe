@@ -8,7 +8,7 @@
 -- 1) Esquema próprio, fora do "public" (no Supabase, o "public" é exposto pela API REST do projeto)
 CREATE SCHEMA IF NOT EXISTS nfse;
 
--- 2) Usuários: ROBÔ (escritório, grava) e DASHBOARD (Streamlit Cloud, só lê)
+-- 2) Usuários: ROBÔ (escritório, grava) e PAINEL WEB (App Service, só lê)
 DO $$
 BEGIN
   IF NOT EXISTS (SELECT 1 FROM pg_roles WHERE rolname = 'nfse_robo') THEN
@@ -35,6 +35,10 @@ ALTER TABLE IF EXISTS nfse.notas OWNER TO nfse_robo;
 -- e libera a leitura nas tabelas que já existirem
 GRANT SELECT ON ALL TABLES IN SCHEMA nfse TO nfse_leitura;
 REVOKE nfse_robo FROM CURRENT_USER;
+
+-- As tabelas nfse.empresas e nfse.certificados (versão multiempresa) são criadas pelo robô e recebem o
+-- SELECT para nfse_leitura pela regra acima. A migração da nfse.notas exige que o nfse_robo seja o dono dela
+-- (se não for, rode antes o sql/corrigir_dono_tabela.sql).
 
 -- 4) Conferência (rodar depois da primeira importação do robô):
 --    SELECT count(*) FROM nfse.notas;

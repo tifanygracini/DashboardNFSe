@@ -16,6 +16,16 @@ def pasta_xml() -> Path:
 def xml_raiz():
     """Raiz parseada de um arquivo de fixture cujo nome começa com o prefixo dado."""
     def _abrir(prefixo: str):
-        arq = next(PASTA_XML.glob(f"{prefixo}*.xml"))
+        arq = sorted(PASTA_XML.rglob(f"{prefixo}*.xml"))[0]  # ordem fixa no Windows e no Linux
         return ET.parse(arq).getroot(), arq
     return _abrir
+
+
+def cadastrar(destino, cnpj: str, razao: str, regime: str = "Simples Nacional", codigo: str = "", **extra):
+    """Empresa no cadastro, como se viesse do Acessórias."""
+    from nfse.data import EmpresasRepository, conectar
+    with conectar(destino) as con:
+        EmpresasRepository(con).gravar_do_acessorias({
+            "cnpj": cnpj, "razao_social": razao, "fantasia": extra.get("fantasia", ""), "codigo_dominio": codigo,
+            "acessorias_id": extra.get("acessorias_id", ""), "regime_acessorias": extra.get("regime_acessorias", regime),
+            "regime": regime, "grupo": "", "uf": "SP"})
