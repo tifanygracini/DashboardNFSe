@@ -8,7 +8,7 @@
 -- 1) Esquema próprio, fora do "public" (no Supabase, o "public" é exposto pela API REST do projeto)
 CREATE SCHEMA IF NOT EXISTS nfse;
 
--- 2) Usuários: ROBÔ (escritório, grava) e DASHBOARD (Streamlit Cloud, só lê)
+-- 2) Usuários: ROBÔ (escritório, grava) e PAINEL WEB (App Service, só lê)
 DO $$
 BEGIN
   IF NOT EXISTS (SELECT 1 FROM pg_roles WHERE rolname = 'nfse_robo') THEN

@@ -29,7 +29,7 @@ from informe_auth import Banco, Identidade, Usuario, carregar_config
 from nfse.config.settings import ConfigError, Settings, get_settings
 from nfse.data.database import ERROS_BANCO, BancoIndisponivel, DestinoBanco
 from nfse.domain.documentos import cnpj_valido, so_digitos
-from nfse.ui.dashboard.marca import Marca, carregar_marca
+from nfse.web.marca import Marca, carregar_marca
 
 from . import carteira, evolucao, painel
 

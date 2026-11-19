@@ -1,14 +1,14 @@
 # Arquitetura
 
 ```
-ui/dashboard  cli
-      \       /
+   web     cli
+      \     /
       services            robo · download · import · relatorios · certificados · sincronizar · migracao
      /    |    \
 clients  data  parsers    adn/client, acessorias · banco, empresas, xml_storage · nfse/evento/codec
      \    |    /
       domain              Nota, TipoNota, StatusNota, regras
-config  (usada por cli/ui para montar as peças; a senha só chega ao clients)
+config  (usada por cli/web para montar as peças; a senha só chega ao clients)
 ```
 
 | Camada | Pode importar | Não pode |
@@ -18,8 +18,8 @@ config  (usada por cli/ui para montar as peças; a senha só chega ao clients)
 | `parsers` | `domain` | banco, rede |
 | `clients/adn` | `config.Segredo` | banco, arquivos de notas |
 | `data` | `domain` | rede, pandas |
-| `services` | `clients`, `data`, `parsers`, `domain` | streamlit, print |
-| `cli`, `ui` | tudo acima + `config` | regra de negócio |
+| `services` | `clients`, `data`, `parsers`, `domain` | fastapi, print |
+| `cli`, `web` | tudo acima + `config` | regra de negócio |
 
 ## Fluxos
 - **Cadastro**: `cli/empresas sincronizar` → `AcessoriasClient.listar_ativas` → `mapear` (regime normalizado) → `EmpresasRepository`.

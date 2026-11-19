@@ -17,7 +17,6 @@ copy .env.example .env                    # e preencha
 | `nfse-empresas senha CNPJ` / `senhas planilha.csv` | guarda senhas de certificados no Gerenciador de Credenciais do Windows |
 | `nfse-baixar` | baixa do ADN para `data/notas/<cnpj>/AAAA-MM/` e importa as novas, de todas as empresas |
 | `nfse-importar` | (re)importa os XMLs de `data/notas/<cnpj>/` para o banco |
-| `nfse-dashboard` | abre o dashboard no navegador |
 | `.\scripts\agendar.ps1` | agenda o robô completo (Acessórias + certificados + ADN) nos dias úteis |
 
 ## Treinar sem certificado
@@ -37,4 +36,4 @@ pytest
 Estrutura e regras de dependência entre camadas: `docs/arquitetura.md`.
 
 ## Dashboard web (FastAPI, login do Portal Informe)
-`uvicorn nfse.web.asgi:app` — substitui o Streamlit após a virada. Como rodar e publicar no Azure: `docs/web.md`.
+`uvicorn nfse.web.asgi:app` abre o painel. Como rodar e publicar no Azure: `docs/web.md`.

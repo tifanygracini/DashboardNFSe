@@ -1,4 +1,4 @@
-# Deploy: dashboard no Streamlit Cloud + banco PostgreSQL + robô no escritório
+# Deploy: banco PostgreSQL + robô no escritório + painel web no Azure
 
 ```
 [computador do escritório]                 [nuvem]
@@ -8,11 +8,11 @@
      └─► nfse-importar ────────────────────────┘
                                                │  usuário nfse_leitura (só lê)
                                                ▼
-                                     Streamlit Community Cloud (app privado)
+                                     Painel web (Azure App Service, login do Portal Informe)
 ```
 
 O certificado A1 e os XMLs **nunca saem do escritório**. Na nuvem ficam só os dados das notas,
-e o dashboard usa um usuário que não consegue alterar nada.
+e o painel usa um usuário que não consegue alterar nada.
 
 ---
 
@@ -31,8 +31,8 @@ e o dashboard usa um usuário que não consegue alterar nada.
    O script pode ser rodado de novo sem problema (por exemplo, para trocar as senhas).
 
 ## 3. Montar as URLs de conexão
-No Supabase, **Connect → Session pooler** (use o pooler: o Streamlit Cloud não acessa a conexão direta,
-que é só IPv6). O formato é:
+No Supabase, **Connect → Session pooler** (use o pooler: a conexão direta é só IPv6
+e nem todo serviço na nuvem a alcança). O formato é:
 
 ```
 postgresql://USUARIO.ID-DO-PROJETO:SENHA@aws-0-sa-east-1.pooler.supabase.com:5432/postgres
@@ -41,7 +41,7 @@ postgresql://USUARIO.ID-DO-PROJETO:SENHA@aws-0-sa-east-1.pooler.supabase.com:543
 | Para | Usuário na URL |
 |---|---|
 | Robô (escritório) | `nfse_robo.ID-DO-PROJETO` |
-| Dashboard (nuvem) | `nfse_leitura.ID-DO-PROJETO` |
+| Painel web (nuvem) | `nfse_leitura.ID-DO-PROJETO` |
 
 Se a senha tiver `@ : / ? # %`, troque por `%40 %3A %2F %3F %23 %25` dentro da URL.
 O sistema liga a criptografia (`sslmode=require`) sozinho para endereços fora da máquina.
@@ -71,35 +71,19 @@ O sistema liga a criptografia (`sslmode=require`) sozinho para endereços fora d
 Para voltar ao SQLite local, basta apagar a linha `NFSE_DATABASE_URL` do `.env`.
 
 ## 5. Repositório no GitHub (privado)
-1. Gere o tema para a nuvem (rode de novo sempre que mudar o `escritorio.json`):
-   ```
-   venv\Scripts\python tools\gerar_config_tema.py
-   ```
-2. Crie um repositório **privado** e envie o projeto. Antes do primeiro commit, rode `git status` e
+1. Crie um repositório **privado** e envie o projeto. Antes do primeiro commit, rode `git status` e
    confira que **não aparecem**: `.env`, arquivos `.pfx`, a pasta `data\` e a pasta `venv\`.
    O `.gitignore` já exclui todos eles.
-3. Devem ir: `src/`, `assets/marca/` (logo e JSON), `.streamlit/config.toml`, `requirements.txt`,
-   `pyproject.toml`.
+2. Devem ir: `src/`, `assets/marca/` (logo e JSON), `requirements*.txt`, `pyproject.toml`.
 
-## 6. Streamlit Community Cloud
-1. Em share.streamlit.io, conecte sua conta do GitHub (autorizando acesso a repositórios privados),
-   clique em **Create app** e escolha o repositório.
-   - **Branch:** `main`
-   - **Main file path:** `src/nfse/ui/dashboard/app.py`
-2. **Advanced settings:**
-   - **Python version:** 3.12
-   - **Secrets** (com a URL **de leitura**):
-     ```toml
-     CNPJ_EMPRESA = "11223344000186"
-     NFSE_DATABASE_URL = "postgresql://nfse_leitura.ID-DO-PROJETO:SENHA@aws-0-sa-east-1.pooler.supabase.com:5432/postgres"
-     ```
-3. **Deploy.** Depois, em **Share → Who can view this app**, deixe **Only specific people** e convide
-   os e-mails autorizados. O dashboard mostra faturamento e dados de clientes: ele não pode ficar público.
+## 6. Painel web (Azure App Service)
+O painel é o app FastAPI de `src/nfse/web/`, com o login do Portal Informe. Ele usa a URL **de leitura**
+(`nfse_leitura`). Como configurar e publicar: [docs/web.md](web.md).
 
 ## 7. Conferência
-- O dashboard abre com a logo, as cores e os mesmos totais do dashboard local.
+- O painel abre com a logo, as cores e os mesmos totais do painel local.
 - No Supabase (SQL Editor): `SELECT count(*) FROM nfse.notas;` bate com o número de notas importadas.
-- Depois da próxima execução da tarefa agendada, as notas novas aparecem no dashboard em até 1 minuto
+- Depois da próxima execução da tarefa agendada, as notas novas aparecem no painel em até 1 minuto
   (tempo do cache).
 
 ## Problemas comuns
@@ -107,10 +91,8 @@ Para voltar ao SQLite local, basta apagar a linha `NFSE_DATABASE_URL` do `.env`.
 | Mensagem | Causa | O que fazer |
 |---|---|---|
 | `permission denied to change default privileges` (no SQL Editor) | versão antiga do `setup_postgres.sql` | use a versão atual, que torna o `postgres` membro do robô durante o comando |
-| `No module named 'nfse'` (no Cloud) | falta `-e .` no `requirements.txt` | confira a última linha do arquivo |
 | `password authentication failed` | senha errada, ou usuário sem `.ID-DO-PROJETO` no pooler | refaça a URL do passo 3 |
 | `permission denied for table notas` (no `nfse-importar`) | a tabela foi criada por outro usuário (ex.: `postgres`) | rode o [sql/corrigir_dono_tabela.sql](../sql/corrigir_dono_tabela.sql) no SQL Editor |
 | `permission denied for schema nfse` | robô usando a URL de leitura | no `.env` do escritório vai a URL do `nfse_robo` |
-| Dashboard diz que o banco está vazio | robô ainda não importou | rode `nfse-importar` no escritório |
-| Cores padrão do Streamlit no Cloud | falta `.streamlit/config.toml` no repositório | passo 5.1 e commit |
+| Painel diz que o banco está vazio | robô ainda não importou | rode `nfse-importar` no escritório |
 | Projeto do Supabase "pausado" | plano gratuito pausa após 7 dias sem uso | a tarefa diária evita; se pausar, reative no painel |

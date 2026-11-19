@@ -15,8 +15,8 @@ import plotly.express as px
 from nfse.data.database import DestinoBanco
 from nfse.domain.models import TipoNota
 from nfse.services import relatorios_service as rel
-from nfse.ui.dashboard.formatters import brl, percentual, sim_nao
-from nfse.ui.dashboard.marca import Marca
+from nfse.web.formatters import brl, percentual, sim_nao
+from nfse.web.marca import Marca
 
 POR_PAGINA = 50
 ROTULOS_TIPO = {TipoNota.EMITIDA.value: "Prestados (emitidas)", TipoNota.RECEBIDA.value: "Tomados (recebidas)"}

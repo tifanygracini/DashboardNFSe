@@ -1,10 +1,8 @@
 # Dashboard web (FastAPI) com o login do Portal Informe
 
-A interface web (`src/nfse/web/`) substitui a interface Streamlit (`src/nfse/ui/dashboard/`).
+A interface web (`src/nfse/web/`) substituiu a antiga interface Streamlit, que foi removida.
 
-Ela usa os mesmos serviços: os totais, rankings e agregações continuam em `services/relatorios_service.py`. Por isso os números são os mesmos nas duas interfaces. O teste `test_web.py` confere o mesmo total de notas que o `test_dashboard.py` conferia no Streamlit.
-
-As duas interfaces convivem durante o piloto. O Streamlit Cloud continua lendo o mesmo banco até a virada.
+Os totais, rankings e agregações ficam em `services/relatorios_service.py`.
 
 ```
 navegador ──► nfse.informecontabil.com (Azure, FastAPI)
@@ -14,7 +12,7 @@ navegador ──► nfse.informecontabil.com (Azure, FastAPI)
 robô no escritório ─► nfse.notas (papel nfse_robo)  — sem mudança
 ```
 
-## O que mudou em relação ao Streamlit
+## O que mudou em relação ao antigo Streamlit
 
 | Streamlit | Web |
 |---|---|
@@ -71,8 +69,7 @@ python -m uvicorn nfse.web.asgi:app --host 0.0.0.0 --port 8000 --workers 2 --pro
 - variável `INFORME_PORTAL_REPO`;
 - segredos `INFORME_PORTAL_TOKEN` (leitura do repositório do portal), `AZURE_CLIENT_ID`, `AZURE_TENANT_ID` e `AZURE_SUBSCRIPTION_ID`.
 
-O workflow copia o `informe-auth` para `vendor/` e usa o `requirements-web.txt` como `requirements.txt` do App Service. O `requirements.txt` do repositório continua sendo o do Streamlit Cloud.
+O workflow copia o `informe-auth` para `vendor/` e usa o `requirements-web.txt` como `requirements.txt` do App Service. O `requirements.txt` do repositório tem só as dependências do robô e do pacote.
 
-## Depois da virada
-- Remover `src/nfse/ui/dashboard/`, `cli/dashboard.py`, `.streamlit/`, o `tests/integration/test_dashboard.py` e a dependência `streamlit` do `pyproject.toml`. O `formatters.py` e o `marca.py` são usados pela interface web: mova-os para `nfse/web/` antes de apagar a pasta.
-- Apagar o app no Streamlit Cloud.
+## Pendente
+- Apagar o app antigo no Streamlit Cloud, se ainda existir.

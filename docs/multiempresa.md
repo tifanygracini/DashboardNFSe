@@ -35,7 +35,7 @@ No Supabase, o papel `nfse_robo` é dono das tabelas, e o `nfse_leitura` (dashbo
 | `ACESSORIAS_API_TOKEN` | token da API do Acessórias (o mesmo da Auditoria de Folha e do Alerta de Pendências) |
 | `ACESSORIAS_CAMPO_DOMINIO` | nome do campo do Acessórias que tem o código da empresa no Domínio (veja abaixo) |
 | `NFSE_PARALELO` | quantas empresas o robô consulta no ADN ao mesmo tempo (padrão 4, máximo 16) |
-| `CNPJ_EMPRESA` | agora é opcional: só serve para a migração (dono das notas antigas) e para o Streamlit antigo |
+| `CNPJ_EMPRESA` | agora é opcional: só serve para a migração (dono das notas antigas) |
 | `CERT_PFX` / `CERT_SENHA` | continuam valendo para a empresa do `CNPJ_EMPRESA` durante a transição |
 
 ### Código do Domínio

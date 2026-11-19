@@ -11,8 +11,8 @@ import pandas as pd
 import plotly.graph_objects as go
 
 from nfse.domain.models import TipoNota
-from nfse.ui.dashboard.formatters import brl
-from nfse.ui.dashboard.marca import Marca
+from nfse.web.formatters import brl
+from nfse.web.marca import Marca
 
 MESES = ["Jan", "Fev", "Mar", "Abr", "Mai", "Jun", "Jul", "Ago", "Set", "Out", "Nov", "Dez"]
 CINZA = {"light": "#8A97A8", "dark": "#6F7F96"}

@@ -2,7 +2,6 @@
 .env
 *.pfx
 *.p12
-.streamlit/secrets.toml
 
 # dados gerados
 /data/

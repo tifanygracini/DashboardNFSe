@@ -19,8 +19,8 @@ from nfse.domain.documentos import so_digitos
 from nfse.domain.empresa import (CERT_AUSENTE, CERT_OK, CERT_VENCENDO, CERT_VENCIDO, REGIMES,
                                  situacao_certificado)
 from nfse.services import relatorios_service as rel
-from nfse.ui.dashboard.formatters import brl
-from nfse.ui.dashboard.marca import Marca
+from nfse.web.formatters import brl
+from nfse.web.marca import Marca
 
 from . import evolucao, painel
 

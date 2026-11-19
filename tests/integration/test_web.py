@@ -167,7 +167,7 @@ def test_parametros_invalidos_nao_quebram(settings):
     assert 'href="//malicioso.com"' not in c.get(f"/empresa/{CNPJ_EXEMPLO}?volta=//malicioso.com").text
 
 
-def test_painel_da_empresa_mostra_os_mesmos_totais_do_streamlit(settings):
+def test_painel_da_empresa_mostra_totais_e_rankings(settings):
     r = montar(settings, CONSULTA).get(f"/empresa/{CNPJ_EXEMPLO}?volta=/%3Fregime%3DMEI")
     assert r.status_code == 200
     assert "EXEMPLO SERVICOS LTDA" in r.text and "315" in r.text and "Lucro Presumido" in r.text

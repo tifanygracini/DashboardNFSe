@@ -1,7 +1,7 @@
 """Números da visão de uma empresa (evolução do faturamento e das notas emitidas)."""
 import pandas as pd
 
-from nfse.ui.dashboard.marca import Marca
+from nfse.web.marca import Marca
 from nfse.web import evolucao as evo
 
 CNPJ = "11222333000181"

@@ -1,7 +1,7 @@
 [project]
 name = "nfse-dashboard"
 version = "0.4.0"
-description = "Robô do ADN (NFS-e nacional) para todas as empresas do escritório + importador PostgreSQL + dashboard"
+description = "Robô do ADN (NFS-e nacional) para todas as empresas do escritório + importador PostgreSQL + painel web"
 requires-python = ">=3.11"
 dependencies = [
     "python-dotenv>=1.0",
@@ -9,14 +9,13 @@ dependencies = [
     "requests-pkcs12>=1.22",
     "pandas>=2.2",
     "plotly>=5.20",
-    "streamlit>=1.46",
     "psycopg[binary]>=3.2",
     "cryptography>=42",   # lê CNPJ e validade dos certificados A1
 ]
 
 [project.optional-dependencies]
 keyring = ["keyring>=25"]
-dev = ["pytest>=8", "httpx>=0.27"]
+dev = ["pytest>=8", "httpx2>=2.16"]  # httpx2: exigido pelo TestClient do Starlette
 # interface web (FastAPI) com o login do Portal Informe; informe-auth vem do repositório informe-portal
 web = ["informe-auth", "uvicorn[standard]>=0.30"]
 
@@ -24,7 +23,6 @@ web = ["informe-auth", "uvicorn[standard]>=0.30"]
 nfse-baixar = "nfse.cli.baixar:main"
 nfse-importar = "nfse.cli.importar:main"
 nfse-empresas = "nfse.cli.empresas:main"
-nfse-dashboard = "nfse.cli.dashboard:main"
 
 [build-system]
 requires = ["setuptools>=69"]

@@ -1,8 +1,7 @@
 """Leitura única e validada das configurações.
 
 Ordem de prioridade: variável de ambiente do sistema > arquivo .env > valor padrão.
-No Streamlit Community Cloud, os segredos de nível raiz viram variáveis de ambiente, então
-não é preciso .env lá.
+No Azure App Service, as configurações do app viram variáveis de ambiente, então não é preciso .env lá.
 O .env é lido com dotenv_values (não altera os.environ, então não vaza para subprocessos).
 Caminhos relativos são resolvidos a partir da raiz do projeto, não da pasta de onde se rodou o comando.
 """
