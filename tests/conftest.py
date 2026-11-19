@@ -16,7 +16,7 @@ def pasta_xml() -> Path:
 def xml_raiz():
     """Raiz parseada de um arquivo de fixture cujo nome começa com o prefixo dado."""
     def _abrir(prefixo: str):
-        arq = next(PASTA_XML.rglob(f"{prefixo}*.xml"))
+        arq = sorted(PASTA_XML.rglob(f"{prefixo}*.xml"))[0]  # ordem fixa no Windows e no Linux
         return ET.parse(arq).getroot(), arq
     return _abrir
 

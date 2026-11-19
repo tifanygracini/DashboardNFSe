@@ -54,7 +54,7 @@ def test_nota_nao_e_evento(xml_raiz):
 
 
 def test_metadados_do_evento(pasta_xml):
-    xml = next(pasta_xml.rglob("*-canc.xml")).read_bytes()
+    xml = sorted(pasta_xml.rglob("*-canc.xml"))[0].read_bytes()  # ordem fixa: a de julho/2026
     assert tipo_do_evento(xml, None) == "101101"
     assert tipo_do_evento(xml, "e101101") == "101101"
     assert competencia_documento(xml, "EVENTO", None) == "2026-07"
