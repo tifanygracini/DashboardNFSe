@@ -1,7 +1,7 @@
 [project]
 name = "nfse-dashboard"
-version = "0.3.0"
-description = "Robô do ADN (NFS-e nacional) + importador PostgreSQL + dashboard (FastAPI e Streamlit)"
+version = "0.4.0"
+description = "Robô do ADN (NFS-e nacional) para todas as empresas do escritório + importador PostgreSQL + dashboard"
 requires-python = ">=3.11"
 dependencies = [
     "python-dotenv>=1.0",
@@ -11,6 +11,7 @@ dependencies = [
     "plotly>=5.20",
     "streamlit>=1.46",
     "psycopg[binary]>=3.2",
+    "cryptography>=42",   # lê CNPJ e validade dos certificados A1
 ]
 
 [project.optional-dependencies]
@@ -22,6 +23,7 @@ web = ["informe-auth", "uvicorn[standard]>=0.30"]
 [project.scripts]
 nfse-baixar = "nfse.cli.baixar:main"
 nfse-importar = "nfse.cli.importar:main"
+nfse-empresas = "nfse.cli.empresas:main"
 nfse-dashboard = "nfse.cli.dashboard:main"
 
 [build-system]

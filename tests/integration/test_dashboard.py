@@ -4,9 +4,9 @@ from pathlib import Path
 import pytest
 
 from conftest import CNPJ_EXEMPLO
-from src.nfse.config import get_settings
-from src.nfse.data import XmlStorage
-from src.nfse.services.import_service import ImportService
+from nfse.config.settings import get_settings
+from nfse.data import DestinoBanco, XmlStorage
+from nfse.services.import_service import ImportService
 
 AppTest = pytest.importorskip("streamlit.testing.v1").AppTest
 APP = Path(__file__).resolve().parents[2] / "src" / "nfse" / "ui" / "dashboard" / "app.py"
@@ -15,7 +15,7 @@ APP = Path(__file__).resolve().parents[2] / "src" / "nfse" / "ui" / "dashboard" 
 @pytest.fixture
 def ambiente(tmp_path, pasta_xml, monkeypatch):
     banco = tmp_path / "notas.db"
-    ImportService(XmlStorage(pasta_xml), banco, CNPJ_EXEMPLO).importar()
+    ImportService(XmlStorage(pasta_xml), DestinoBanco(banco), CNPJ_EXEMPLO).importar()
     env = tmp_path / ".env"
     env.write_text(f"CNPJ_EMPRESA={CNPJ_EXEMPLO}\nNFSE_BANCO={banco}\n", encoding="utf-8")
     for k in ("CNPJ_EMPRESA", "NFSE_BANCO"):

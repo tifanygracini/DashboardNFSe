@@ -36,6 +36,10 @@ ALTER TABLE IF EXISTS nfse.notas OWNER TO nfse_robo;
 GRANT SELECT ON ALL TABLES IN SCHEMA nfse TO nfse_leitura;
 REVOKE nfse_robo FROM CURRENT_USER;
 
+-- As tabelas nfse.empresas e nfse.certificados (versão multiempresa) são criadas pelo robô e recebem o
+-- SELECT para nfse_leitura pela regra acima. A migração da nfse.notas exige que o nfse_robo seja o dono dela
+-- (se não for, rode antes o sql/corrigir_dono_tabela.sql).
+
 -- 4) Conferência (rodar depois da primeira importação do robô):
 --    SELECT count(*) FROM nfse.notas;
 --    SELECT grantee, privilege_type FROM information_schema.role_table_grants WHERE table_schema = 'nfse';

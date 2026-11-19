@@ -2,8 +2,8 @@ from datetime import datetime
 
 import pytest
 
-from src.nfse.data import EstadoAdn, EstadoCorrompido, EstadoRepository, XmlStorage
-from src.nfse.ui.dashboard.formatters import brl, percentual
+from nfse.data import EstadoAdn, EstadoCorrompido, EstadoRepository, XmlStorage
+from nfse.ui.dashboard.formatters import brl, percentual
 
 
 def test_estado_ida_e_volta(tmp_path):

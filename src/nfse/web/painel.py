@@ -7,6 +7,7 @@ import threading
 import time
 from dataclasses import dataclass, field
 from typing import Callable
+from urllib.parse import urlencode
 
 import pandas as pd
 import plotly.express as px
@@ -33,21 +34,25 @@ COLUNAS_TELA = ["data_emissao", "numero", "competencia", "tipo", "prestador_nome
 
 
 class CacheNotas:
-    """Mesmo papel do @st.cache_data(ttl=60): lê o banco no máximo uma vez por minuto."""
+    """Mesmo papel do @st.cache_data(ttl=60): lê as notas de cada empresa no máximo uma vez por minuto.
+    Guarda as últimas `maximo` empresas abertas."""
 
-    def __init__(self, destino: DestinoBanco, ttl: int = 60,
-                 carregar: Callable[[DestinoBanco], pd.DataFrame] = rel.carregar_notas):
-        self.destino, self.ttl, self._carregar = destino, ttl, carregar
-        self._dados: pd.DataFrame | None = None
-        self._ate = 0.0
+    def __init__(self, destino: DestinoBanco, ttl: int = 60, maximo: int = 30,
+                 carregar: Callable[[DestinoBanco, str], pd.DataFrame] = rel.carregar_notas):
+        self.destino, self.ttl, self.maximo, self._carregar = destino, ttl, maximo, carregar
+        self._dados: dict[str, tuple[float, pd.DataFrame]] = {}
         self._trava = threading.Lock()
 
-    def obter(self) -> pd.DataFrame:
+    def obter(self, cnpj: str) -> pd.DataFrame:
         with self._trava:
-            if self._dados is None or time.monotonic() > self._ate:
-                self._dados = self._carregar(self.destino)
-                self._ate = time.monotonic() + self.ttl
-            return self._dados
+            item = self._dados.get(cnpj)
+            if item is None or time.monotonic() > item[0]:
+                self._dados.pop(cnpj, None)
+                if len(self._dados) >= self.maximo:  # descarta a mais antiga
+                    self._dados.pop(min(self._dados, key=lambda k: self._dados[k][0]))
+                item = (time.monotonic() + self.ttl, self._carregar(self.destino, cnpj))
+                self._dados[cnpj] = item
+            return item[1]
 
 
 @dataclass
@@ -65,7 +70,6 @@ class Filtros:
 
     def query(self, **troca) -> str:
         """Query string com os filtros atuais (para paginação e exportação)."""
-        from urllib.parse import urlencode
         p = {"de": self.de, "ate": self.ate, "busca": self.busca, "pagina": self.pagina}
         p.update(troca)
         pares = [(k, v) for k, v in p.items() if v not in ("", None)] + [("tipo", t) for t in self.tipos]

@@ -1,4 +1,4 @@
-"""Pasta de XMLs -> banco. Pode rodar várias vezes: a chave de acesso evita duplicidade."""
+"""Pasta de XMLs de uma empresa -> banco. Pode rodar várias vezes: (empresa, chave de acesso) evita duplicidade."""
 import xml.etree.ElementTree as ET
 from dataclasses import dataclass, field
 
@@ -31,7 +31,7 @@ class ImportService:
         res = ResultadoImportacao()
         cancelamentos: list[str] = []
         with conectar(self.destino) as con:
-            repo = NotasRepository(con)
+            repo = NotasRepository(con, self.cnpj_empresa)
             for arq in self.storage.listar():
                 try:
                     raiz = ET.parse(arq).getroot()

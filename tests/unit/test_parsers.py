@@ -4,10 +4,10 @@ import gzip
 import pytest
 
 from conftest import CNPJ_EXEMPLO
-from src.nfse.domain import RegraError, StatusNota, TipoNota
-from src.nfse.parsers.codec import codificar, decodificar
-from src.nfse.parsers.evento_parser import chave_cancelada, competencia_documento, tipo_do_evento
-from src.nfse.parsers.nfse_parser import ler_nota
+from nfse.domain import RegraError, StatusNota, TipoNota
+from nfse.parsers.codec import codificar, decodificar
+from nfse.parsers.evento_parser import chave_cancelada, competencia_documento, tipo_do_evento
+from nfse.parsers.nfse_parser import ler_nota
 
 XML = b"<?xml version='1.0'?><a/>"
 
@@ -44,7 +44,7 @@ def test_nota_de_outra_empresa(xml_raiz):
 
 
 def test_evento_de_cancelamento(xml_raiz):
-    raiz, _ = xml_raiz("2026-07-28-617252-canc")
+    raiz, _ = xml_raiz("2026-07-28-52087072111223344000186000000000000197911723617252-canc")
     assert chave_cancelada(raiz) == "52087072111223344000186000000000000197911723617252"
 
 
@@ -54,7 +54,7 @@ def test_nota_nao_e_evento(xml_raiz):
 
 
 def test_metadados_do_evento(pasta_xml):
-    xml = next(pasta_xml.glob("*-canc.xml")).read_bytes()
+    xml = next(pasta_xml.rglob("*-canc.xml")).read_bytes()
     assert tipo_do_evento(xml, None) == "101101"
     assert tipo_do_evento(xml, "e101101") == "101101"
     assert competencia_documento(xml, "EVENTO", None) == "2026-07"

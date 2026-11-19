@@ -26,9 +26,7 @@ jobs:
         with:
           python-version: "3.12"
       - run: pip install -e "./_portal/informe-auth" -e ".[dev]"
-      # test_dashboard, test_fluxo_completo, test_domain e test_parsers já falhavam antes desta branch
-      # (imports antigos de src.nfse); entram aqui quando forem corrigidos.
-      - run: pytest -q tests/integration/test_web.py tests/unit/test_data.py tests/unit/test_settings.py
+      - run: pytest -q
 
   deploy:
     needs: testes

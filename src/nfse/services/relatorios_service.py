@@ -1,22 +1,85 @@
-"""Leitura do banco e agregações do dashboard (pandas). Devolve números, a formatação fica na UI."""
+"""Leitura do banco e agregações do dashboard (pandas). Devolve números, a formatação fica na UI.
+
+Duas visões:
+  carteira  todas as empresas: uma linha por (empresa, competência, tipo) agregada no próprio banco
+  empresa   as notas de uma empresa, como no dashboard original
+"""
 from dataclasses import dataclass
 
 import pandas as pd
 
-from nfse.data import DestinoBanco, conectar
-from nfse.data.database import COLUNAS, existe_tabela
+from nfse.data import BancoDesatualizado, DestinoBanco, conectar
+from nfse.data.database import COLUNAS, COLUNAS_EMPRESAS, existe_tabela, notas_no_formato_antigo
 from nfse.domain.models import StatusNota, TipoNota
 
+COLUNAS_RESUMO = ["empresa_cnpj", "competencia", "tipo", "valor", "notas", "iss_retido", "ultima_emissao"]
 
-def carregar_notas(destino: DestinoBanco) -> pd.DataFrame:
-    """Lê todas as notas (só leitura: funciona com o usuário somente-leitura do PostgreSQL)."""
+
+def _verificar(con):
+    if notas_no_formato_antigo(con):
+        raise BancoDesatualizado("O banco ainda está no formato de uma empresa só. No computador do robô, rode: "
+                                 "nfse-empresas migrar")
+
+
+def carregar_notas(destino: DestinoBanco, empresa_cnpj: str | None = None) -> pd.DataFrame:
+    """Notas de uma empresa (ou de todas). Só leitura: funciona com o usuário somente-leitura do PostgreSQL."""
     with conectar(destino, criar=False) as con:
         if not existe_tabela(con):
             return pd.DataFrame(columns=[nome for nome, _ in COLUNAS])
-        cur = con.executar(f"SELECT * FROM {con.tabela}")
+        _verificar(con)
+        sql, params = f"SELECT * FROM {con.tabela}", ()
+        if empresa_cnpj:
+            sql, params = sql + " WHERE empresa_cnpj=?", (empresa_cnpj,)
+        cur = con.executar(sql, params)
         colunas = [d[0] for d in cur.description]
         linhas = cur.fetchall()
     return pd.DataFrame(linhas, columns=colunas)
+
+
+def carregar_empresas(destino: DestinoBanco) -> pd.DataFrame:
+    with conectar(destino, criar=False) as con:
+        if not existe_tabela(con, "empresas"):
+            return pd.DataFrame(columns=[n for n, _ in COLUNAS_EMPRESAS])
+        return pd.DataFrame(con.linhas(f"SELECT * FROM {con.empresas}"), columns=[n for n, _ in COLUNAS_EMPRESAS])
+
+
+def carregar_resumo(destino: DestinoBanco) -> pd.DataFrame:
+    """Totais por empresa, competência e tipo, sem as canceladas (agregado no banco: leve mesmo com
+    centenas de milhares de notas)."""
+    with conectar(destino, criar=False) as con:
+        if not existe_tabela(con):
+            return pd.DataFrame(columns=COLUNAS_RESUMO)
+        _verificar(con)
+        linhas = con.executar(
+            "SELECT empresa_cnpj, competencia, tipo, SUM(base_calculo), COUNT(*), "
+            "SUM(CASE WHEN iss_retido=1 THEN valor_retido ELSE 0 END), MAX(data_emissao) "
+            f"FROM {con.tabela} WHERE status<>? GROUP BY empresa_cnpj, competencia, tipo",
+            (StatusNota.CANCELADA.value,)).fetchall()
+    df = pd.DataFrame(linhas, columns=COLUNAS_RESUMO)
+    for c in ("valor", "iss_retido"):
+        df[c] = pd.to_numeric(df[c]).fillna(0.0)
+    return df
+
+
+def carteira(empresas: pd.DataFrame, resumo: pd.DataFrame, competencias) -> pd.DataFrame:
+    """Uma linha por empresa: faturamento, tomados, notas, ISS retido e última emissão no período."""
+    r = resumo[resumo["competencia"].isin(competencias)]
+    emit = r[r["tipo"] == TipoNota.EMITIDA.value].groupby("empresa_cnpj").agg(
+        faturamento=("valor", "sum"), notas_emitidas=("notas", "sum"), iss_retido=("iss_retido", "sum"))
+    receb = r[r["tipo"] == TipoNota.RECEBIDA.value].groupby("empresa_cnpj").agg(
+        tomados=("valor", "sum"), notas_recebidas=("notas", "sum"))
+    ultima = resumo.groupby("empresa_cnpj")["ultima_emissao"].max().rename("ultima_emissao")
+    df = empresas.set_index("cnpj").join([emit, receb, ultima])
+    for c in ("faturamento", "tomados", "iss_retido", "notas_emitidas", "notas_recebidas"):
+        df[c] = df[c].fillna(0)
+    df["notas"] = (df["notas_emitidas"] + df["notas_recebidas"]).astype(int)
+    return df.reset_index().rename(columns={"index": "cnpj"})
+
+
+def mensal_carteira(resumo: pd.DataFrame, cnpjs, competencias) -> pd.DataFrame:
+    """competencia, tipo, base_calculo (soma) das empresas escolhidas — mesmo formato de mensal()."""
+    r = resumo[resumo["empresa_cnpj"].isin(cnpjs) & resumo["competencia"].isin(competencias)]
+    return r.groupby(["competencia", "tipo"])["valor"].sum().reset_index().rename(columns={"valor": "base_calculo"})
 
 
 @dataclass(frozen=True)

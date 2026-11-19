@@ -3,9 +3,9 @@
 ```
 ui/dashboard  cli
       \       /
-      services            download_service · import_service · relatorios_service
+      services            robo · download · import · relatorios · certificados · sincronizar · migracao
      /    |    \
-clients  data  parsers    adn/client · sqlite, xml_storage, estado · nfse/evento/codec
+clients  data  parsers    adn/client, acessorias · banco, empresas, xml_storage · nfse/evento/codec
      \    |    /
       domain              Nota, TipoNota, StatusNota, regras
 config  (usada por cli/ui para montar as peças; a senha só chega ao clients)
@@ -14,6 +14,7 @@ config  (usada por cli/ui para montar as peças; a senha só chega ao clients)
 | Camada | Pode importar | Não pode |
 |---|---|---|
 | `domain` | nada do projeto | I/O, pandas, requests |
+| `config.cofre` | keyring | banco (as senhas dos certificados nunca vão para o banco) |
 | `parsers` | `domain` | banco, rede |
 | `clients/adn` | `config.Segredo` | banco, arquivos de notas |
 | `data` | `domain` | rede, pandas |
@@ -21,9 +22,13 @@ config  (usada por cli/ui para montar as peças; a senha só chega ao clients)
 | `cli`, `ui` | tudo acima + `config` | regra de negócio |
 
 ## Fluxos
-- **Baixar**: `cli/baixar` → `DownloadService` → `AdnClient.consultar(nsu)` → `XmlStorage.gravar` → `EstadoRepository.gravar` → (se houver novos) `cli/importar`.
-- **Importar**: `ImportService` → `XmlStorage.listar` → `parsers` → `NotasRepository` (INSERT OR IGNORE pela chave) → cancelamentos.
-- **Dashboard**: `relatorios_service.carregar_notas` → `recortar` → `totais`/`mensal`/`ranking` → componentes Streamlit.
+- **Cadastro**: `cli/empresas sincronizar` → `AcessoriasClient.listar_ativas` → `mapear` (regime normalizado) → `EmpresasRepository`.
+- **Certificados**: `cli/empresas certificados` → `CertificadosService.varrer` → cofre (senha) → `ler_certificado` (CNPJ e validade) → empresa ↔ certificado (mesmo CNPJ ou mesma raiz).
+- **Baixar**: `cli/baixar` → `RoboService` → por empresa, em paralelo: `DownloadService` (`AdnClient` com o certificado dela, `EstadoBanco`, `XmlStorage(<pasta>/<cnpj>)`) → depois, uma por vez, `ImportService`.
+- **Importar**: `ImportService(empresa)` → `XmlStorage.listar` → `parsers` → `NotasRepository(empresa)` (ignora (empresa, chave) repetida) → cancelamentos.
+- **Dashboard web**: carteira = `carregar_empresas` + `carregar_resumo` (agregado no banco) → `carteira`; empresa = `carregar_notas(cnpj)` → `recortar` → `totais`/`mensal`/`ranking`.
+
+Visão geral da versão multiempresa: `docs/multiempresa.md`.
 
 ## Configuração
 `nfse.config.get_settings()` lê variáveis de ambiente e `.env` (nessa prioridade), valida o CNPJ e

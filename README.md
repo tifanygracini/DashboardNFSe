@@ -1,23 +1,27 @@
 # NFS-e → Dashboard
 
-Baixa as NFS-e da empresa no ADN (Ambiente de Dados Nacional), grava num SQLite e mostra num dashboard.
+Baixa as NFS-e de **todas as empresas clientes do escritório** no ADN (Ambiente de Dados Nacional), com o certificado A1 de cada uma, grava no banco e mostra num dashboard com filtros por regime, razão social, CNPJ e código do Domínio. O cadastro das empresas vem do Acessórias. Detalhes: `docs/multiempresa.md`.
 
 ## Instalação (Windows, PowerShell, na raiz do projeto)
 ```powershell
 python -m venv .venv
-.venv\Scripts\pip install -e .            # ou: pip install -e ".[keyring,dev]"
+.venv\Scripts\pip install -e ".[keyring]"  # ou: pip install -e ".[keyring,dev]"
 copy .env.example .env                    # e preencha
 ```
 
 ## Uso
 | Comando | O que faz |
 |---|---|
-| `nfse-baixar` | baixa do ADN para `data/notas/AAAA-MM/` e importa as novas |
-| `nfse-importar` | (re)importa todos os XMLs de `data/notas/` para `data/notas.db` |
+| `nfse-empresas sincronizar` | cadastro das empresas ativas do Acessórias |
+| `nfse-empresas certificados` | liga cada empresa ao seu certificado A1 da pasta de rede (`CERT_PASTA`) |
+| `nfse-empresas senha CNPJ` / `senhas planilha.csv` | guarda senhas de certificados no Gerenciador de Credenciais do Windows |
+| `nfse-baixar` | baixa do ADN para `data/notas/<cnpj>/AAAA-MM/` e importa as novas, de todas as empresas |
+| `nfse-importar` | (re)importa os XMLs de `data/notas/<cnpj>/` para o banco |
 | `nfse-dashboard` | abre o dashboard no navegador |
-| `.\scripts\agendar.ps1` | agenda o `nfse-baixar` para todo dia às 08:00 |
+| `.\scripts\agendar.ps1` | agenda o robô completo (Acessórias + certificados + ADN) nos dias úteis |
 
 ## Treinar sem certificado
+Com `CNPJ_EMPRESA=11223344000186` no `.env` (a empresa entra no cadastro sozinha):
 ```powershell
 python tools\fake_adn.py --xmls tests\fixtures\xml
 nfse-baixar --base-url http://127.0.0.1:8787 --sem-certificado --forcar

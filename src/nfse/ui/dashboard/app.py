@@ -13,9 +13,10 @@ from nfse.ui.dashboard.marca import carregar_marca
 
 
 @st.cache_data(ttl=60, show_spinner="Carregando notas...")
-def _carregar(_destino: DestinoBanco, chave: str):
-    """`_destino` fica fora da chave do cache (tem a senha); `chave` identifica o banco sem a senha."""
-    return rel.carregar_notas(_destino)
+def _carregar(_destino: DestinoBanco, chave: str, empresa: str):
+    """`_destino` fica fora da chave do cache (tem a senha); `chave` identifica o banco sem a senha.
+    Interface antiga (até a virada para a web): mostra só a empresa do CNPJ_EMPRESA."""
+    return rel.carregar_notas(_destino, empresa or None)
 
 
 def main():
@@ -38,7 +39,7 @@ def main():
 
     destino = DestinoBanco(cfg.banco, cfg.database_url)
     try:
-        dados = _carregar(destino, destino.chave_cache())
+        dados = _carregar(destino, destino.chave_cache(), cfg.cnpj_empresa)
     except BancoIndisponivel as e:
         st.warning(str(e))
         st.stop()
